@@ -1,0 +1,186 @@
+/* ============================================================
+   MATERIAL DESIGN DASHBOARD LAYOUT
+   ============================================================ */
+
+.dashboard-wrapper {
+  min-height: 100vh;
+  background-color: var(--md-gray-100);
+}
+
+/* ============================================================
+   DASHBOARD CONTAINER
+   ============================================================ */
+
+.dashboard-container {
+  padding: var(--md-spacing-6);
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   DASHBOARD GRID - Material Design Card
+   ============================================================ */
+
+.dashboard-grid {
+  display: grid;
+  width: 100%;
+  position: relative;
+  background: white;
+  border-radius: var(--md-radius-medium);
+  padding: var(--md-spacing-6);
+  box-shadow: var(--md-elevation-2);
+  min-height: 500px;
+  transition: box-shadow 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* Grid overlay - Material Design Primary Color */
+.grid-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(to right, rgba(25, 118, 210, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(25, 118, 210, 0.08) 1px, transparent 1px);
+  background-size: calc((100% - 48px) / 12) 100px;
+  background-position: 24px 24px;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: var(--md-radius-medium);
+}
+
+.grid-item {
+  position: relative;
+  z-index: 2;
+  transition: opacity 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.grid-item.dragging {
+  opacity: 0.5;
+  z-index: 1;
+}
+
+.grid-item.resizing {
+  z-index: 3;
+}
+
+/* ============================================================
+   DRAG & DROP PREVIEW - Material Design
+   ============================================================ */
+
+.drop-preview {
+  background: rgba(25, 118, 210, 0.08);
+  border: 2px dashed var(--md-primary);
+  border-radius: var(--md-radius-medium);
+  pointer-events: none;
+  z-index: 10;
+  animation: mdPulse 1s infinite;
+}
+
+.drop-preview.invalid {
+  background: rgba(244, 67, 54, 0.08);
+  border-color: var(--md-warn);
+  animation: mdShake 0.5s;
+}
+
+@keyframes mdPulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes mdShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+/* ============================================================
+   RESIZE PREVIEW - Material Design
+   ============================================================ */
+
+.resize-preview {
+  background: rgba(25, 118, 210, 0.12);
+  border: 2px solid var(--md-primary);
+  border-radius: var(--md-radius-medium);
+  pointer-events: none;
+  z-index: 11;
+  position: relative;
+}
+
+.resize-preview::after {
+  content: attr(data-size);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--md-primary);
+  color: white;
+  padding: var(--md-spacing-1) var(--md-spacing-3);
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: var(--md-elevation-2);
+  letter-spacing: 0.25px;
+}
+
+.resize-preview.invalid {
+  background: rgba(244, 67, 54, 0.12);
+  border-color: var(--md-warn);
+}
+
+.resize-preview.invalid::after {
+  background: var(--md-warn);
+}
+
+/* ============================================================
+   EMPTY STATE - Material Design
+   ============================================================ */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--md-spacing-12) var(--md-spacing-6);
+  text-align: center;
+  color: var(--md-gray-500);
+}
+
+.empty-state svg {
+  opacity: 0.24;
+  margin-bottom: var(--md-spacing-6);
+  color: var(--md-gray-400);
+}
+
+.empty-state h2 {
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--md-gray-700);
+  margin: 0 0 var(--md-spacing-3) 0;
+  letter-spacing: 0.25px;
+}
+
+.empty-state p {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--md-gray-500);
+  margin: 0 0 var(--md-spacing-6) 0;
+  letter-spacing: 0.25px;
+}
+
+/* ============================================================
+   Note: Dialog, Form, Color Picker, and Size Picker styles
+   have been moved to add-widget-dialog.component.css
+   ============================================================ */

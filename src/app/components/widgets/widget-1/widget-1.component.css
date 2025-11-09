@@ -1,0 +1,125 @@
+/* ============================================================
+   MATERIAL DESIGN WIDGET 1 - Metrics & Charts
+   ============================================================ */
+
+.widget-1-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--md-spacing-3);
+  padding: var(--md-spacing-2);
+  overflow: hidden;
+}
+
+/* ============================================================
+   MATERIAL DESIGN METRICS ROW
+   ============================================================ */
+
+.metrics-row {
+  display: flex;
+  gap: var(--md-spacing-2);
+  justify-content: space-between;
+}
+
+.metric-card {
+  flex: 1;
+  background: var(--md-gray-50);
+  border: 1px solid var(--md-gray-200);
+  border-radius: var(--md-radius-medium);
+  padding: var(--md-spacing-2);
+  text-align: center;
+  min-width: 0;
+  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+  box-shadow: var(--md-elevation-1);
+}
+
+.metric-card:hover {
+  box-shadow: var(--md-elevation-2);
+  transform: translateY(-2px);
+}
+
+.metric-label {
+  font-size: 10px;
+  color: var(--md-gray-600);
+  font-weight: 500;
+  margin-bottom: var(--md-spacing-1);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--md-gray-900);
+  margin-bottom: var(--md-spacing-1);
+}
+
+.metric-change {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.25px;
+}
+
+.metric-change.positive {
+  color: var(--md-success);
+}
+
+.metric-change.negative {
+  color: var(--md-warn);
+}
+
+/* ============================================================
+   MATERIAL DESIGN CHART CONTAINER
+   ============================================================ */
+
+.chart-container {
+  flex: 1;
+  background: var(--md-gray-50);
+  border: 1px solid var(--md-gray-200);
+  border-radius: var(--md-radius-medium);
+  padding: var(--md-spacing-3);
+  display: flex;
+  align-items: flex-end;
+  box-shadow: var(--md-elevation-1);
+}
+
+.chart-bars {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  gap: var(--md-spacing-2);
+  align-items: flex-end;
+  justify-content: space-around;
+}
+
+.chart-bar-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.chart-bar {
+  width: 100%;
+  background: linear-gradient(to top, var(--md-primary), var(--md-primary-dark));
+  border-radius: var(--md-radius-small) var(--md-radius-small) 0 0;
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  box-shadow: 0 -2px 4px rgba(25, 118, 210, 0.2);
+}
+
+.chart-bar:hover {
+  background: linear-gradient(to top, var(--md-primary-dark), var(--md-primary));
+  transform: scaleY(1.05);
+  box-shadow: 0 -4px 8px rgba(25, 118, 210, 0.3);
+}
+
+.chart-label {
+  font-size: 10px;
+  color: var(--md-gray-600);
+  margin-top: var(--md-spacing-1);
+  font-weight: 500;
+  letter-spacing: 0.4px;
+}

@@ -1,0 +1,361 @@
+/* ============================================================
+   MATERIAL DESIGN WIDGET CONTAINER
+   ============================================================ */
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.widget-container {
+  position: relative;
+  background: white;
+  border: 1px solid var(--md-gray-300);
+  border-radius: var(--md-radius-medium);
+  padding: var(--md-spacing-4);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  cursor: default;
+  user-select: none;
+  overflow: hidden;
+  box-shadow: var(--md-elevation-1);
+}
+
+.widget-container:hover {
+  border-color: var(--md-primary-light);
+  box-shadow: var(--md-elevation-3);
+  transform: translateY(-2px);
+}
+
+.widget-container.dragging {
+  opacity: 0.5;
+  box-shadow: var(--md-elevation-6);
+}
+
+.widget-container.resizing {
+  transition: none;
+  box-shadow: var(--md-elevation-4);
+}
+
+/* ============================================================
+   WIDGET HEADER - MATERIAL DESIGN
+   ============================================================ */
+
+.widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--md-spacing-2);
+  min-height: 40px;
+  flex-shrink: 0;
+  padding-bottom: var(--md-spacing-2);
+  border-bottom: 1px solid var(--md-gray-200);
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* UX Enhancement: Expand header when editing title */
+.widget-header:has(.widget-title[contenteditable="true"]) {
+  min-height: auto;
+  overflow: visible;
+  z-index: 100;
+}
+
+/* ============================================================
+   ACTION BUTTONS - MATERIAL DESIGN
+   ============================================================ */
+
+.action-buttons {
+  display: flex;
+  gap: var(--md-spacing-1);
+  opacity: 0;
+  transition: opacity 0.2s cubic-bezier(0.4, 0.0, 0.2, 1), visibility 0.2s;
+  z-index: 10;
+  flex-shrink: 0;
+  visibility: visible;
+}
+
+.widget-container:hover .action-buttons {
+  opacity: 1;
+}
+
+/* UX Enhancement: Hide action buttons during title editing */
+.widget-header:has(.widget-title[contenteditable="true"]) .action-buttons {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--md-spacing-2);
+}
+
+/* ============================================================
+   DRAG HANDLE - MATERIAL DESIGN
+   ============================================================ */
+
+.drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  cursor: move;
+  color: var(--md-gray-500);
+  opacity: 0;
+  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+  border-radius: var(--md-radius-small);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.drag-handle::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.1);
+  transform: translate(-50%, -50%);
+  transition: width 0.4s, height 0.4s;
+}
+
+.drag-handle:active::before {
+  width: 100px;
+  height: 100px;
+}
+
+.drag-handle:hover {
+  background-color: var(--md-gray-200);
+  color: var(--md-gray-900);
+}
+
+.drag-handle:active {
+  background-color: var(--md-gray-300);
+}
+
+.widget-container:hover .drag-handle {
+  opacity: 1;
+}
+
+/* ============================================================
+   ACTION BUTTONS - MATERIAL DESIGN ICON BUTTONS
+   ============================================================ */
+
+.action-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: var(--md-radius-small);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  color: var(--md-gray-600);
+}
+
+.action-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.1);
+  transform: translate(-50%, -50%);
+  transition: width 0.4s, height 0.4s;
+}
+
+.action-btn:hover {
+  background: var(--md-gray-100);
+  transform: scale(1.1);
+}
+
+.action-btn:hover::before {
+  width: 80px;
+  height: 80px;
+}
+
+.action-btn:active {
+  transform: scale(1);
+}
+
+/* Refresh Button */
+.refresh-btn {
+  color: var(--md-primary);
+}
+
+.refresh-btn:hover {
+  background: var(--md-primary);
+  color: white;
+}
+
+.refresh-btn:hover svg {
+  animation: mdRotateOnce 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+@keyframes mdRotateOnce {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Delete Button */
+.delete-btn {
+  color: var(--md-warn);
+}
+
+.delete-btn:hover {
+  background: var(--md-warn);
+  color: white;
+}
+
+/* ============================================================
+   WIDGET CONTENT SLOT
+   ============================================================ */
+
+.widget-content-slot {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: var(--md-spacing-3);
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+  /* overflow-y: auto; */ /* Uncomment to enable vertical scrolling */
+}
+
+/* ============================================================
+   WIDGET TITLE - MATERIAL DESIGN
+   ============================================================ */
+
+.widget-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--md-gray-900);
+  text-align: left;
+  line-height: 1.5;
+  letter-spacing: 0.15px;
+  word-break: break-word;
+  outline: none;
+  padding: var(--md-spacing-1) var(--md-spacing-2);
+  border-radius: var(--md-radius-small);
+  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  position: relative;
+}
+
+/* UX Enhancement: Better editing experience */
+.widget-title[contenteditable="true"] {
+  background-color: white;
+  color: var(--md-gray-900);
+  cursor: text;
+  border: 2px solid var(--md-primary);
+  white-space: normal;
+  overflow: visible;
+  box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.12), var(--md-elevation-2);
+  z-index: 101;
+  position: relative;
+  padding: var(--md-spacing-2) var(--md-spacing-3);
+  min-height: 40px;
+  width: 100%;
+  flex: none;
+  text-align: left;
+  font-size: 15px;
+  line-height: 1.6;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* UX Enhancement: Show hover hint for editable title */
+.widget-title:not([contenteditable="true"]):hover {
+  background-color: var(--md-gray-50);
+  cursor: pointer;
+}
+
+/* UX Enhancement: Add subtle hint text */
+.widget-title:not([contenteditable="true"])::after {
+  content: ' (double-click to edit)';
+  font-size: 10px;
+  color: var(--md-gray-500);
+  font-weight: 400;
+  opacity: 0;
+  transition: opacity 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+  letter-spacing: 0.4px;
+}
+
+.widget-title:not([contenteditable="true"]):hover::after {
+  opacity: 1;
+}
+
+/* ============================================================
+   RESIZE HANDLE - MATERIAL DESIGN
+   ============================================================ */
+
+.widget-size-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--md-gray-700);
+  background: var(--md-gray-100);
+  padding: var(--md-spacing-1) var(--md-spacing-2);
+  border-radius: 12px;
+  letter-spacing: 0.4px;
+}
+
+.resize-handle {
+  position: absolute;
+  bottom: var(--md-spacing-1);
+  right: var(--md-spacing-1);
+  width: 24px;
+  height: 24px;
+  cursor: nwse-resize;
+  color: var(--md-gray-500);
+  opacity: 0;
+  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--md-radius-small);
+}
+
+.widget-container:hover .resize-handle {
+  opacity: 1;
+}
+
+.resize-handle:hover {
+  color: var(--md-primary);
+  background: rgba(25, 118, 210, 0.08);
+  transform: scale(1.2);
+}
+
+.resize-handle:active {
+  transform: scale(1);
+  color: var(--md-primary-dark);
+  background: rgba(25, 118, 210, 0.16);
+}

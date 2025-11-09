@@ -1,0 +1,24 @@
+<!-- src/app/components/confirm-dialog/confirm-dialog.component.html -->
+
+<div class="confirm-backdrop" (click)="onCancel()">
+  <div class="confirm-dialog" (click)="$event.stopPropagation()">
+    <div class="confirm-content">
+      <div class="confirm-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" 
+                fill="currentColor"/>
+        </svg>
+      </div>
+      <p class="confirm-message">{{ message }}</p>
+    </div>
+    <div class="confirm-actions">
+      <button class="confirm-btn cancel" (click)="onCancel()">
+        Cancel
+      </button>
+      <button class="confirm-btn confirm-action" (click)="onConfirm()">
+        Confirm
+      </button>
+    </div>
+  </div>
+</div>
+

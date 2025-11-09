@@ -1,0 +1,83 @@
+<div class="dashboard-wrapper">
+  <!-- Dashboard Header Component -->
+  <app-dashboard-header
+    [widgetCount]="widgets().length"
+    [showGrid]="showGrid()"
+    (addWidget)="showAddWidgetDialog()"
+    (toggleGrid)="toggleGrid()"
+    (exportLayout)="onExportLayout()"
+    (importFile)="onImportFile($event)"
+    (resetLayout)="onResetLayout()">
+  </app-dashboard-header>
+
+  <div class="dashboard-container">
+    <div class="dashboard-grid" 
+         #gridContainer
+         [style.grid-template-columns]="gridColumns()"
+         [style.gap.px]="GRID_CONFIG.gap"
+         [style.grid-auto-rows.px]="GRID_CONFIG.rowHeight">
+      
+      @if (showGrid()) {
+        <div class="grid-overlay"></div>
+      }
+      
+      @for (widget of widgets(); track widget.id) {
+        <div class="grid-item"
+             [style.grid-column]="getGridColumn(widget)"
+             [style.grid-row]="getGridRow(widget)"
+             [class.dragging]="dragState.isDragging && dragState.widget?.id === widget.id"
+             [class.resizing]="resizeState.isResizing && resizeState.widget?.id === widget.id"
+             (mousedown)="onWidgetMouseDown($event, widget)">
+          
+                  <app-widget-template 
+                    [widget]="widget"
+                    (delete)="onWidgetDelete($event)"
+                    (titleChange)="onWidgetTitleChange($event)"
+                    (resizeStart)="onResizeStart($event)">
+                  </app-widget-template>
+        </div>
+      }
+      
+      @if (dragState.isDragging && dragState.previewPosition) {
+        <div class="drop-preview"
+             [class.invalid]="dragState.hasCollision"
+             [style.grid-column]="getPreviewGridColumn()"
+             [style.grid-row]="getPreviewGridRow()">
+        </div>
+      }
+      
+      @if (resizeState.isResizing && resizeState.previewSize) {
+        <div class="resize-preview"
+             [class.invalid]="resizeState.hasCollision"
+             [style.grid-column]="getResizePreviewColumn()"
+             [style.grid-row]="getResizePreviewRow()"
+             [attr.data-size]="resizeState.previewSize.colSpan + '×' + resizeState.previewSize.rowSpan">
+        </div>
+      }
+    </div>
+    
+    @if (widgets().length === 0) {
+      <div class="empty-state">
+        <!-- Icon: Grid 3x2 (Custom) -->
+        <svg width="120" height="120" viewBox="0 0 120 120" fill="currentColor" data-icon="grid-empty">
+          <path d="M10 20h35v35H10V20zm40 0h35v35H50V20zm40 0h35v35H90V20zM10 65h35v35H10V65zm40 0h35v35H50V65zm40 0h35v35H90V65z" opacity="0.3"/>
+        </svg>
+        <h2>Your dashboard is empty</h2>
+        <p>Click "Add Widget" to create your first widget</p>
+        <button class="btn btn-primary btn-lg" 
+                (click)="showAddWidgetDialog()"
+                title="Get Started">
+          Get Started
+        </button>
+      </div>
+    }
+  </div>
+  
+  <!-- Add Widget Dialog Component -->
+  <app-add-widget-dialog
+    [show]="showAddDialog()"
+    (confirm)="onAddWidgetConfirm($event)"
+    (cancel)="closeAddDialog()">
+  </app-add-widget-dialog>
+</div>
+

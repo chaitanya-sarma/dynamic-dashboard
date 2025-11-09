@@ -1,0 +1,27 @@
+<div class="widget-2-content">
+  <div class="header">
+    <h3>{{ title }}</h3>
+    <p class="description">{{ description }}</p>
+  </div>
+  
+  <div class="features">
+    <h4>Features:</h4>
+    <ul>
+      @for (feature of features; track feature) {
+        <li>{{ feature }}</li>
+      }
+    </ul>
+  </div>
+  
+  <div class="footer">
+    <div class="stat">
+      <span class="label">Last Refreshed:</span>
+      <span class="value">{{ lastRefreshed | date:'short' }}</span>
+    </div>
+    <div class="stat">
+      <span class="label">Refresh Count:</span>
+      <span class="value">{{ refreshCount }}</span>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,391 @@
+/* ============================================================
+   MATERIAL DESIGN THEME - GLOBAL STYLES
+   ============================================================ */
+
+/* Import Material Design font */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+/* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ============================================================
+   MATERIAL DESIGN VARIABLES
+   ============================================================ */
+
+:root {
+  /* Material Design Color Palette */
+  --md-primary: #1976d2;
+  --md-primary-light: #42a5f5;
+  --md-primary-dark: #1565c0;
+  --md-accent: #ff4081;
+  --md-accent-light: #ff80ab;
+  --md-accent-dark: #f50057;
+  --md-warn: #f44336;
+  --md-success: #4caf50;
+  --md-info: #2196f3;
+  --md-warning: #ff9800;
+  
+  /* Material Design Grays */
+  --md-gray-50: #fafafa;
+  --md-gray-100: #f5f5f5;
+  --md-gray-200: #eeeeee;
+  --md-gray-300: #e0e0e0;
+  --md-gray-400: #bdbdbd;
+  --md-gray-500: #9e9e9e;
+  --md-gray-600: #757575;
+  --md-gray-700: #616161;
+  --md-gray-800: #424242;
+  --md-gray-900: #212121;
+  
+  /* Material Design Elevations (shadows) */
+  --md-elevation-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  --md-elevation-2: 0 3px 6px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.12);
+  --md-elevation-3: 0 10px 20px rgba(0,0,0,0.15), 0 3px 6px rgba(0,0,0,0.10);
+  --md-elevation-4: 0 14px 28px rgba(0,0,0,0.15), 0 10px 10px rgba(0,0,0,0.12);
+  --md-elevation-6: 0 19px 38px rgba(0,0,0,0.20), 0 15px 12px rgba(0,0,0,0.14);
+  --md-elevation-8: 0 24px 48px rgba(0,0,0,0.20), 0 18px 16px rgba(0,0,0,0.14);
+  
+  /* Material Design Spacing (8dp grid) */
+  --md-spacing-1: 4px;
+  --md-spacing-2: 8px;
+  --md-spacing-3: 12px;
+  --md-spacing-4: 16px;
+  --md-spacing-5: 20px;
+  --md-spacing-6: 24px;
+  --md-spacing-8: 32px;
+  --md-spacing-10: 40px;
+  --md-spacing-12: 48px;
+  
+  /* Material Design Border Radius */
+  --md-radius-small: 4px;
+  --md-radius-medium: 8px;
+  --md-radius-large: 12px;
+  
+  /* Material Design Typography */
+  --md-font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+
+body {
+  font-family: var(--md-font-family);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--md-gray-900);
+  background: var(--md-gray-100);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================
+   MATERIAL DESIGN SCROLLBAR
+   ============================================================ */
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--md-gray-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--md-gray-400);
+  border-radius: 6px;
+  border: 2px solid var(--md-gray-100);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--md-gray-500);
+}
+
+/* ============================================================
+   MATERIAL DESIGN SELECTION
+   ============================================================ */
+
+::selection {
+  background: var(--md-primary);
+  color: white;
+}
+
+::-moz-selection {
+  background: var(--md-primary);
+  color: white;
+}
+
+/* ============================================================
+   MATERIAL DESIGN FOCUS STYLES
+   ============================================================ */
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--md-primary);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   MATERIAL DESIGN TYPOGRAPHY CLASSES
+   ============================================================ */
+
+.md-headline-1 {
+  font-size: 96px;
+  font-weight: 300;
+  letter-spacing: -1.5px;
+}
+
+.md-headline-2 {
+  font-size: 60px;
+  font-weight: 300;
+  letter-spacing: -0.5px;
+}
+
+.md-headline-3 {
+  font-size: 48px;
+  font-weight: 400;
+}
+
+.md-headline-4 {
+  font-size: 34px;
+  font-weight: 400;
+  letter-spacing: 0.25px;
+}
+
+.md-headline-5 {
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.md-headline-6 {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.15px;
+}
+
+.md-subtitle-1 {
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.15px;
+}
+
+.md-subtitle-2 {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+}
+
+.md-body-1 {
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+.md-body-2 {
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.25px;
+}
+
+.md-caption {
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.4px;
+}
+
+.md-overline {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   MATERIAL DESIGN UTILITY CLASSES
+   ============================================================ */
+
+.text-center {
+  text-align: center;
+}
+
+/* Material Spacing Utilities */
+.mt-1 { margin-top: var(--md-spacing-1); }
+.mt-2 { margin-top: var(--md-spacing-2); }
+.mt-3 { margin-top: var(--md-spacing-3); }
+.mt-4 { margin-top: var(--md-spacing-4); }
+
+.mb-1 { margin-bottom: var(--md-spacing-1); }
+.mb-2 { margin-bottom: var(--md-spacing-2); }
+.mb-3 { margin-bottom: var(--md-spacing-3); }
+.mb-4 { margin-bottom: var(--md-spacing-4); }
+
+.p-1 { padding: var(--md-spacing-1); }
+.p-2 { padding: var(--md-spacing-2); }
+.p-3 { padding: var(--md-spacing-3); }
+.p-4 { padding: var(--md-spacing-4); }
+
+/* Material Elevation Classes */
+.elevation-0 { box-shadow: none; }
+.elevation-1 { box-shadow: var(--md-elevation-1); }
+.elevation-2 { box-shadow: var(--md-elevation-2); }
+.elevation-3 { box-shadow: var(--md-elevation-3); }
+.elevation-4 { box-shadow: var(--md-elevation-4); }
+.elevation-6 { box-shadow: var(--md-elevation-6); }
+.elevation-8 { box-shadow: var(--md-elevation-8); }
+
+/* ============================================================
+   MATERIAL DESIGN ANIMATIONS
+   ============================================================ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* ============================================================
+   MATERIAL DESIGN DISABLED STATE
+   ============================================================ */
+
+button:disabled,
+input:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   SMOOTH SCROLLING
+   ============================================================ */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ============================================================
+   LOADING ANIMATION
+   ============================================================ */
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading {
+  animation: spin 1s linear infinite;
+}
+
+/* ============================================================
+   PRINT STYLES
+   ============================================================ */
+
+@media print {
+  body {
+    background: white;
+  }
+  
+  .dashboard-actions,
+  .widget-actions,
+  .drag-handle,
+  .resize-handle,
+  .delete-btn {
+    display: none !important;
+  }
+  
+  .dashboard-wrapper {
+    padding: 0;
+  }
+  
+  .widget-container {
+    break-inside: avoid;
+  }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

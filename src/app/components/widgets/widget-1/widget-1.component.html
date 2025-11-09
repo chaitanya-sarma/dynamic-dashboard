@@ -1,0 +1,27 @@
+<div class="widget-1-content">
+  <!-- Metrics Display -->
+  <div class="metrics-row">
+    @for (metric of metrics; track metric.label) {
+      <div class="metric-card">
+        <div class="metric-label">{{ metric.label }}</div>
+        <div class="metric-value">{{ metric.value }}</div>
+        <div class="metric-change" [class.positive]="metric.positive" [class.negative]="!metric.positive">
+          {{ metric.change }}
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Mini Chart -->
+  <div class="chart-container">
+    <div class="chart-bars">
+      @for (bar of chartBars; track bar.label) {
+        <div class="chart-bar-wrapper">
+          <div class="chart-bar" [style.height.%]="bar.height"></div>
+          <div class="chart-label">{{ bar.label }}</div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+

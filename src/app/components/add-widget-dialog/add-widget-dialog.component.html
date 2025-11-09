@@ -1,0 +1,75 @@
+<!-- src/app/components/add-widget-dialog/add-widget-dialog.component.html -->
+
+@if (show) {
+  <div class="dialog-overlay" (click)="onOverlayClick()">
+    <div class="dialog-content" (click)="onContentClick($event)">
+      <h2>Add New Widget</h2>
+      
+      <!-- Future: Search functionality -->
+      <!-- Uncomment when search is needed
+      <div class="form-group">
+        <input type="text" 
+               class="search-input"
+               [(ngModel)]="searchQuery"
+               (ngModelChange)="onSearchChange()"
+               placeholder="Search widgets..."
+               autocomplete="off">
+      </div>
+      -->
+      
+      <div class="form-group">
+        <label>Widget Title</label>
+        <input type="text" 
+               class="form-input"
+               [(ngModel)]="widgetTitle"
+               placeholder="Enter widget title"
+               (keydown)="onTitleKeydown($event)"
+               autocomplete="off">
+      </div>
+      
+      <div class="form-group">
+        <label>Widget Type</label>
+        <select class="form-input" 
+                [(ngModel)]="selectedWidgetType">
+          @for (widgetType of filteredWidgetTypes; track widgetType.type) {
+            <option [value]="widgetType.type">
+              {{ widgetType.label }} - {{ widgetType.description }}
+            </option>
+          }
+        </select>
+        
+        <!-- Future: Widget type cards with icons and descriptions -->
+        <!-- This will replace the simple dropdown above -->
+      </div>
+      
+      <div class="form-group">
+        <label>Color</label>
+        <div class="color-grid">
+          @for (color of availableColors; track color) {
+            <button type="button"
+                    class="color-option"
+                    [class.selected]="selectedColor === color"
+                    [style.background-color]="color"
+                    (click)="selectedColor = color"
+                    [title]="color">
+            </button>
+          }
+        </div>
+      </div>
+      
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" 
+                (click)="onCancel()"
+                title="Cancel">
+          Cancel
+        </button>
+        <button class="btn btn-primary" 
+                (click)="onConfirm()"
+                title="Add Widget">
+          Add Widget
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
