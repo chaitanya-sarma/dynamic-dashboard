@@ -25,13 +25,14 @@
 .dialog-content {
   background: white;
   border-radius: var(--md-radius-large);
-  padding: var(--md-spacing-6);
-  max-width: 600px;
+  max-width: 800px;
   width: 95%;
   box-shadow: var(--md-elevation-8);
-  animation: slideUp 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  animation: slideUp 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
   max-height: 90vh;
-  overflow-y: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes slideUp {
@@ -272,5 +273,300 @@ select.form-input {
 .widget-type-card.selected {
   border-color: var(--md-primary);
   background: rgba(25, 118, 210, 0.08);
+}
+
+/* ============================================================
+   DIALOG HEADER WITH TABS
+   ============================================================ */
+
+.dialog-header {
+  padding: var(--md-spacing-6) var(--md-spacing-6) 0;
+  border-bottom: 1px solid var(--md-gray-200);
+}
+
+.dialog-header h2 {
+  margin: 0 0 var(--md-spacing-4) 0;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--md-gray-900);
+  letter-spacing: 0.15px;
+}
+
+.tab-navigation {
+  display: flex;
+  gap: 0;
+  margin-bottom: -1px;
+}
+
+.tab-button {
+  display: flex;
+  align-items: center;
+  gap: var(--md-spacing-2);
+  padding: var(--md-spacing-3) var(--md-spacing-4);
+  border: none;
+  background: transparent;
+  color: var(--md-gray-600);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+  position: relative;
+}
+
+.tab-button:hover {
+  color: var(--md-primary-500);
+  background: rgba(25, 118, 210, 0.04);
+}
+
+.tab-button.active {
+  color: var(--md-primary-500);
+  border-bottom-color: var(--md-primary-500);
+}
+
+.tab-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* ============================================================
+   TAB CONTENT
+   ============================================================ */
+
+.tab-content {
+  padding: var(--md-spacing-6);
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ============================================================
+   PREVIEW TAB STYLES
+   ============================================================ */
+
+.widget-preview-section {
+  margin-bottom: var(--md-spacing-6);
+}
+
+.preview-description {
+  margin: 0 0 var(--md-spacing-4) 0;
+  color: var(--md-gray-600);
+  font-size: 14px;
+}
+
+.widget-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--md-spacing-4);
+  margin-bottom: var(--md-spacing-6);
+}
+
+.widget-preview-card {
+  border: 1px solid var(--md-gray-200);
+  border-radius: var(--md-radius-medium);
+  padding: var(--md-spacing-4);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+  background: white;
+  position: relative;
+}
+
+.widget-preview-card:hover {
+  border-color: var(--md-primary-300);
+  box-shadow: var(--md-elevation-2);
+  transform: translateY(-1px);
+}
+
+.widget-preview-card.selected {
+  border-color: var(--md-primary-500);
+  box-shadow: var(--md-elevation-4);
+  background: rgba(25, 118, 210, 0.02);
+}
+
+.widget-preview-header {
+  display: flex;
+  align-items: center;
+  gap: var(--md-spacing-3);
+  margin-bottom: var(--md-spacing-3);
+}
+
+.widget-preview-color {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--md-radius-small);
+  flex-shrink: 0;
+}
+
+.widget-preview-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.widget-preview-title {
+  margin: 0 0 2px 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--md-gray-900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.widget-preview-type {
+  font-size: 12px;
+  color: var(--md-gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.widget-preview-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.size-badge {
+  background: var(--md-gray-100);
+  color: var(--md-gray-700);
+  padding: 2px 6px;
+  border-radius: var(--md-radius-small);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.selection-indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  background: var(--md-primary-500);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.selection-indicator svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* ============================================================
+   PROFESSIONAL LOADING STATES
+   ============================================================ */
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--md-spacing-12) var(--md-spacing-6);
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  margin-bottom: var(--md-spacing-4);
+  position: relative;
+}
+
+.loading-spinner::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 3px solid var(--md-gray-200);
+  border-top: 3px solid var(--md-primary-500);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: var(--md-gray-600);
+  font-size: 14px;
+  margin: 0;
+}
+
+/* ============================================================
+   ERROR AND EMPTY STATES
+   ============================================================ */
+
+.error-container,
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--md-spacing-12) var(--md-spacing-6);
+  text-align: center;
+}
+
+.error-icon,
+.empty-icon {
+  width: 48px;
+  height: 48px;
+  color: var(--md-gray-400);
+  margin-bottom: var(--md-spacing-4);
+}
+
+.error-title,
+.empty-title {
+  margin: 0 0 var(--md-spacing-2) 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--md-gray-900);
+}
+
+.error-message,
+.empty-message {
+  margin: 0 0 var(--md-spacing-6) 0;
+  color: var(--md-gray-600);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.btn-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: var(--md-spacing-2);
+}
+
+/* ============================================================
+   RESPONSIVE DESIGN
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .dialog-content {
+    max-width: 95%;
+    margin: var(--md-spacing-4);
+  }
+  
+  .tab-navigation {
+    flex-direction: column;
+    gap: 2px;
+  }
+  
+  .tab-button {
+    justify-content: center;
+    padding: var(--md-spacing-3);
+    border-bottom: none;
+    border-left: 3px solid transparent;
+  }
+  
+  .tab-button.active {
+    border-left-color: var(--md-primary-500);
+    border-bottom-color: transparent;
+  }
+  
+  .widget-preview-grid {
+    grid-template-columns: 1fr;
+  }
 }
 

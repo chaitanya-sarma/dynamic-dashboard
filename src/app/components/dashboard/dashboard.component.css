@@ -180,6 +180,141 @@
   letter-spacing: 0.25px;
 }
 
+/* Update empty actions */
+.empty-actions {
+  display: flex;
+  gap: var(--md-spacing-3);
+  justify-content: center;
+  margin-top: var(--md-spacing-6);
+}
+
+/* ============================================================
+   LOADING STATES & ERROR HANDLING
+   ============================================================ */
+
+/* Error Banner */
+.error-banner {
+  background: rgba(244, 67, 54, 0.08);
+  border: 1px solid rgba(244, 67, 54, 0.2);
+  border-radius: var(--md-radius-medium);
+  margin: var(--md-spacing-4) var(--md-spacing-6) 0;
+  position: relative;
+  animation: slideDown 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.error-content {
+  display: flex;
+  align-items: center;
+  padding: var(--md-spacing-4);
+  color: #d32f2f;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.error-content svg {
+  margin-right: var(--md-spacing-3);
+  flex-shrink: 0;
+}
+
+.error-content span {
+  flex: 1;
+}
+
+.btn-error-close {
+  background: none;
+  border: none;
+  color: #d32f2f;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.btn-error-close:hover {
+  background-color: rgba(244, 67, 54, 0.1);
+}
+
+/* Loading Overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--md-spacing-4);
+  color: var(--md-primary-500);
+}
+
+/* Professional loading spinner - no more "spinning twists" */
+.loading-spinner::before {
+  content: '';
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--md-gray-200);
+  border-top: 3px solid var(--md-primary-500);
+  border-radius: 50%;
+  animation: professionalSpin 1s linear infinite;
+}
+
+@keyframes professionalSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-spinner span {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--md-gray-700);
+}
+
+/* Grid loading state */
+.dashboard-grid.loading {
+  opacity: 0.7;
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* ============================================================
    Note: Dialog, Form, Color Picker, and Size Picker styles
    have been moved to add-widget-dialog.component.css

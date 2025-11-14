@@ -1,8 +1,9 @@
 // src/app/components/widgets/widget-2/widget-2.component.ts
 
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BaseWidgetContent } from '../../../models/widget-content.interface';
+import { Widget } from '../../../models/widget.model';
 
 @Component({
   selector: 'app-widget-2',
@@ -12,6 +13,8 @@ import { BaseWidgetContent } from '../../../models/widget-content.interface';
   styleUrls: ['./widget-2.component.css']
 })
 export class Widget2Component extends BaseWidgetContent {
+  @Input() widget!: Widget;
+  
   // Simple static content
   title = 'Welcome to Widget 2';
   description = 'This is a simple text widget that displays static content.';

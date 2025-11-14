@@ -3,19 +3,44 @@
   <app-dashboard-header
     [widgetCount]="widgets().length"
     [showGrid]="showGrid()"
+    [isLoading]="isLoading()"
     (addWidget)="showAddWidgetDialog()"
     (toggleGrid)="toggleGrid()"
+    (refreshWidgets)="refreshWidgets()"
     (exportLayout)="onExportLayout()"
     (importFile)="onImportFile($event)"
     (resetLayout)="onResetLayout()">
   </app-dashboard-header>
+
+  <!-- Error State -->
+  @if (loadingState().error) {
+    <div class="error-banner">
+      <div class="error-content">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+        <span>{{ loadingState().error }}</span>
+        <button class="btn-error-close" (click)="clearError()" title="Close">×</button>
+      </div>
+    </div>
+  }
+
+  <!-- Loading Overlay -->
+  @if (loadingState().isLoadingWidgets) {
+    <div class="loading-overlay">
+      <div class="loading-spinner">
+        <span>Loading widgets from online service...</span>
+      </div>
+    </div>
+  }
 
   <div class="dashboard-container">
     <div class="dashboard-grid" 
          #gridContainer
          [style.grid-template-columns]="gridColumns()"
          [style.gap.px]="GRID_CONFIG.gap"
-         [style.grid-auto-rows.px]="GRID_CONFIG.rowHeight">
+         [style.grid-auto-rows.px]="GRID_CONFIG.rowHeight"
+         [class.loading]="isLoading()">
       
       @if (showGrid()) {
         <div class="grid-overlay"></div>
@@ -33,7 +58,8 @@
                     [widget]="widget"
                     (delete)="onWidgetDelete($event)"
                     (titleChange)="onWidgetTitleChange($event)"
-                    (resizeStart)="onResizeStart($event)">
+                    (resizeStart)="onResizeStart($event)"
+                    (refresh)="onWidgetRefresh($event)">
                   </app-widget-template>
         </div>
       }
@@ -56,19 +82,43 @@
       }
     </div>
     
-    @if (widgets().length === 0) {
+    @if (widgets().length === 0 && !loadingState().isLoadingWidgets) {
       <div class="empty-state">
         <!-- Icon: Grid 3x2 (Custom) -->
         <svg width="120" height="120" viewBox="0 0 120 120" fill="currentColor" data-icon="grid-empty">
           <path d="M10 20h35v35H10V20zm40 0h35v35H50V20zm40 0h35v35H90V20zM10 65h35v35H10V65zm40 0h35v35H50V65zm40 0h35v35H90V65z" opacity="0.3"/>
         </svg>
-        <h2>Your dashboard is empty</h2>
-        <p>Click "Add Widget" to create your first widget</p>
-        <button class="btn btn-primary btn-lg" 
-                (click)="showAddWidgetDialog()"
-                title="Get Started">
-          Get Started
-        </button>
+        @if (loadingState().error) {
+          <h2>Failed to load widgets</h2>
+          <p>Unable to fetch widgets from the online service. You can try refreshing or add widgets manually.</p>
+          <div class="empty-actions">
+            <button class="btn btn-secondary" 
+                    (click)="refreshWidgets()"
+                    title="Refresh">
+              Refresh
+            </button>
+            <button class="btn btn-primary" 
+                    (click)="showAddWidgetDialog()"
+                    title="Add Widget">
+              Add Widget
+            </button>
+          </div>
+        } @else {
+          <h2>Your dashboard is empty</h2>
+          <p>Widgets are loaded from an online service. Click "Add Widget" to create your first widget.</p>
+          <div class="empty-actions">
+            <button class="btn btn-secondary" 
+                    (click)="refreshWidgets()"
+                    title="Refresh">
+              Refresh from API
+            </button>
+            <button class="btn btn-primary" 
+                    (click)="showAddWidgetDialog()"
+                    title="Get Started">
+              Add Widget
+            </button>
+          </div>
+        }
       </div>
     }
   </div>

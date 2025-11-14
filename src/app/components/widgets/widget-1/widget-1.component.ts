@@ -1,8 +1,9 @@
 // src/app/components/widgets/widget-1/widget-1.component.ts
 
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BaseWidgetContent } from '../../../models/widget-content.interface';
+import { Widget } from '../../../models/widget.model';
 
 @Component({
   selector: 'app-widget-1',
@@ -12,6 +13,8 @@ import { BaseWidgetContent } from '../../../models/widget-content.interface';
   styleUrls: ['./widget-1.component.css']
 })
 export class Widget1Component extends BaseWidgetContent {
+  @Input() widget!: Widget;
+  
   // Simple data - no network calls
   metrics = [
     { label: 'Users', value: '1,234', change: '+12%', positive: true },

@@ -1,13 +1,17 @@
 // src/app/services/dashboard.service.ts
 
-import { Injectable, signal, computed } from '@angular/core';
-import { Widget, DashboardLayout, GRID_CONFIG, DEFAULT_WIDGET_COLOR, WidgetType, WIDGET_TYPES, WidgetTypeMetadata } from '../models/widget.model';
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { Widget, DashboardLayout, GRID_CONFIG, DEFAULT_WIDGET_COLOR, WidgetType, WIDGET_TYPES, WidgetTypeMetadata, DashboardLoadingState } from '../models/widget.model';
 import { AddWidgetConfig } from '../components/add-widget-dialog/add-widget-dialog.component';
+import { WidgetApiService } from './widget-api.service';
+import { firstValueFrom, catchError, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DashboardService {
+  private widgetApiService = inject(WidgetApiService);
+
   // Using Angular 18 signals for reactive state management
   private widgetsSignal = signal<Widget[]>([]);
   private layoutSignal = signal<DashboardLayout>({
@@ -16,23 +20,100 @@ export class DashboardService {
     widgets: []
   });
 
+  // Loading state management
+  private loadingStateSignal = signal<DashboardLoadingState>({
+    isLoadingWidgets: false,
+    isCreatingWidget: false,
+    isUpdatingWidget: false,
+    isDeletingWidget: false,
+    error: null
+  });
+
   // Public readonly signals
   widgets = this.widgetsSignal.asReadonly();
   layout = this.layoutSignal.asReadonly();
+  loadingState = this.loadingStateSignal.asReadonly();
 
   // Computed values
   widgetCount = computed(() => this.widgetsSignal().length);
+  isLoading = computed(() => {
+    const state = this.loadingStateSignal();
+    return state.isLoadingWidgets || state.isCreatingWidget || 
+           state.isUpdatingWidget || state.isDeletingWidget;
+  });
 
-  constructor() {
-    this.loadFromStorage();
+  // Helper method to update loading state
+  private setLoadingState(partialState: Partial<DashboardLoadingState>): void {
+    this.loadingStateSignal.update(current => ({ ...current, ...partialState }));
   }
 
-  // Initialize with sample data demonstrating both widget types
+  constructor() {
+    this.initializeDashboard();
+  }
+
+  // Initialize dashboard by first trying to load from API, then storage, then sample data
+  private async initializeDashboard(): Promise<void> {
+    try {
+      // First, try to load from local storage (for cached/offline data)
+      const hasLocalData = this.loadFromStorage();
+      
+      // Then attempt to load fresh data from API
+      await this.loadFromApi();
+    } catch (error) {
+      console.error('Failed to initialize dashboard from API:', error);
+      
+      // If API fails and no local data, use sample data
+      if (this.widgetsSignal().length === 0) {
+        this.initializeSampleData();
+      }
+    }
+  }
+
+  // Load widgets from online API service
+  async loadFromApi(): Promise<void> {
+    this.setLoadingState({ isLoadingWidgets: true, error: null });
+    
+    try {
+      const widgets = await firstValueFrom(
+        this.widgetApiService.fetchWidgets().pipe(
+          catchError(error => {
+            console.error('API fetch failed:', error);
+            throw error;
+          })
+        )
+      );
+      
+      this.widgetsSignal.set(widgets);
+      this.saveToStorage(); // Cache the API data locally
+      this.setLoadingState({ isLoadingWidgets: false });
+      
+      console.log(`Loaded ${widgets.length} widgets from API`);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load widgets from API';
+      this.setLoadingState({ 
+        isLoadingWidgets: false, 
+        error: errorMessage 
+      });
+      throw error;
+    }
+  }
+
+  // Refresh widgets from API (manual refresh)
+  async refreshWidgets(): Promise<void> {
+    try {
+      await this.loadFromApi();
+    } catch (error) {
+      // Error is already handled in loadFromApi, just propagate
+      throw error;
+    }
+  }
+
+  // Initialize with sample data (fallback when API is unavailable)
   initializeSampleData(): void {
     const sampleWidgets: Widget[] = [
       {
         id: '1',
-        title: 'Metrics Dashboard',
+        title: 'Metrics Dashboard (Local)',
         type: 'widget-1',
         gridPosition: { col: 0, row: 0 },
         gridSize: { colSpan: 3, rowSpan: 2 },
@@ -40,7 +121,7 @@ export class DashboardService {
       },
       {
         id: '2',
-        title: 'Welcome',
+        title: 'Welcome (Local)',
         type: 'widget-2',
         gridPosition: { col: 3, row: 0 },
         gridSize: { colSpan: 2, rowSpan: 2 },
@@ -52,7 +133,7 @@ export class DashboardService {
     this.saveToStorage();
   }
 
-  // Add a new widget
+  // Add a new widget (local only - for immediate UI updates)
   addWidget(widget: Widget): void {
     const currentWidgets = this.widgetsSignal();
     this.widgetsSignal.set([...currentWidgets, widget]);
@@ -61,26 +142,62 @@ export class DashboardService {
 
   // Create and add a new widget from configuration (Business Logic)
   // This centralizes widget creation, ID generation, and position finding
-  createAndAddWidget(config: AddWidgetConfig): void {
-    // Get default size from widget type metadata
-    const widgetTypeMetadata = this.getWidgetTypeMetadata(config.type);
-    const defaultSize = widgetTypeMetadata?.defaultSize || { colSpan: 2, rowSpan: 2 };
-    
-    // Find available position
-    const position = this.findAvailablePosition(defaultSize);
-    
-    // Create widget with generated ID
-    const newWidget: Widget = {
-      id: this.generateWidgetId(),
-      title: config.title,
-      type: config.type,
-      gridPosition: position,
-      gridSize: { colSpan: defaultSize.colSpan, rowSpan: defaultSize.rowSpan },
-      color: config.color
-    };
-    
-    // Add to collection
-    this.addWidget(newWidget);
+  async createAndAddWidget(config: AddWidgetConfig): Promise<void> {
+    this.setLoadingState({ isCreatingWidget: true, error: null });
+
+    try {
+      let widgetToAdd: Widget;
+
+      if (config.fromOnline && config.onlineWidget) {
+        // Use online widget data but find new position
+        const position = this.findAvailablePosition(config.onlineWidget.gridSize);
+        widgetToAdd = {
+          ...config.onlineWidget,
+          id: this.generateWidgetId(), // Generate new ID for local use
+          gridPosition: position
+        };
+      } else {
+        // Create new widget locally
+        const widgetTypeMetadata = this.getWidgetTypeMetadata(config.type);
+        const defaultSize = widgetTypeMetadata?.defaultSize || { colSpan: 2, rowSpan: 2 };
+        const position = this.findAvailablePosition(defaultSize);
+        
+        const newWidgetData: Partial<Widget> = {
+          title: config.title,
+          type: config.type,
+          gridPosition: position,
+          gridSize: { colSpan: defaultSize.colSpan, rowSpan: defaultSize.rowSpan },
+          color: config.color
+        };
+
+        // Create widget via API service
+        widgetToAdd = await firstValueFrom(
+          this.widgetApiService.createWidget(newWidgetData).pipe(
+            catchError(error => {
+              console.error('Failed to create widget via API:', error);
+              // Fallback to local creation
+              const localWidget: Widget = {
+                ...newWidgetData,
+                id: this.generateWidgetId()
+              } as Widget;
+              return of(localWidget);
+            })
+          )
+        );
+      }
+      
+      // Add to local collection
+      this.addWidget(widgetToAdd);
+      this.setLoadingState({ isCreatingWidget: false });
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create widget';
+      this.setLoadingState({ 
+        isCreatingWidget: false, 
+        error: errorMessage 
+      });
+      throw error;
+    }
   }
 
   // Generate unique widget ID
@@ -89,22 +206,79 @@ export class DashboardService {
   }
 
   // Delete widget
-  deleteWidget(widgetId: string): void {
-    const widgets = this.widgetsSignal();
-    this.widgetsSignal.set(widgets.filter(w => w.id !== widgetId));
-    this.saveToStorage();
+  async deleteWidget(widgetId: string): Promise<void> {
+    this.setLoadingState({ isDeletingWidget: true, error: null });
+
+    try {
+      // First remove from local state for immediate UI feedback
+      const widgets = this.widgetsSignal();
+      const updatedWidgets = widgets.filter(w => w.id !== widgetId);
+      this.widgetsSignal.set(updatedWidgets);
+      this.saveToStorage();
+
+      // Then delete from API (fire and forget, with error logging)
+      firstValueFrom(
+        this.widgetApiService.deleteWidget(widgetId).pipe(
+          catchError(error => {
+            console.error('Failed to delete widget via API:', error);
+            // Don't restore widget since local deletion succeeded
+            return of(null);
+          })
+        )
+      ).catch(() => {
+        // Silently handle API deletion failures
+      });
+
+      this.setLoadingState({ isDeletingWidget: false });
+
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete widget';
+      this.setLoadingState({ 
+        isDeletingWidget: false, 
+        error: errorMessage 
+      });
+      throw error;
+    }
   }
 
   // Update widget title
-  updateWidgetTitle(widgetId: string, newTitle: string): void {
-    const widgets = this.widgetsSignal();
-    const updatedWidgets = widgets.map(widget =>
-      widget.id === widgetId
-        ? { ...widget, title: newTitle }
-        : { ...widget, gridSize: { ...widget.gridSize }, gridPosition: { ...widget.gridPosition } } // Clone all widgets to prevent mutation
-    );
-    this.widgetsSignal.set(updatedWidgets);
-    this.saveToStorage();
+  async updateWidgetTitle(widgetId: string, newTitle: string): Promise<void> {
+    this.setLoadingState({ isUpdatingWidget: true, error: null });
+
+    try {
+      const widgets = this.widgetsSignal();
+      const updatedWidgets = widgets.map(widget =>
+        widget.id === widgetId
+          ? { ...widget, title: newTitle }
+          : { ...widget, gridSize: { ...widget.gridSize }, gridPosition: { ...widget.gridPosition } } // Clone all widgets to prevent mutation
+      );
+      this.widgetsSignal.set(updatedWidgets);
+      this.saveToStorage();
+
+      // Update via API
+      const widgetToUpdate = updatedWidgets.find(w => w.id === widgetId);
+      if (widgetToUpdate) {
+        await firstValueFrom(
+          this.widgetApiService.updateWidget(widgetToUpdate).pipe(
+            catchError(error => {
+              console.error('Failed to update widget via API:', error);
+              // Local update already succeeded, so don't throw
+              return of(widgetToUpdate);
+            })
+          )
+        );
+      }
+
+      this.setLoadingState({ isUpdatingWidget: false });
+
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update widget';
+      this.setLoadingState({ 
+        isUpdatingWidget: false, 
+        error: errorMessage 
+      });
+      throw error;
+    }
   }
 
   // Move widget to a new position
@@ -185,19 +359,19 @@ export class DashboardService {
     localStorage.setItem('dashboard-widgets-v2', JSON.stringify(this.widgetsSignal()));
   }
 
-  private loadFromStorage(): void {
+  private loadFromStorage(): boolean {
     const saved = localStorage.getItem('dashboard-widgets-v2');
     if (saved) {
       try {
         const widgets = JSON.parse(saved);
         this.widgetsSignal.set(widgets);
+        return true; // Successfully loaded from storage
       } catch (e) {
         console.error('Failed to load dashboard from storage', e);
-        this.initializeSampleData();
+        return false;
       }
-    } else {
-      this.initializeSampleData();
     }
+    return false; // No data in storage
   }
 
   // Export/Import configuration
@@ -231,5 +405,24 @@ export class DashboardService {
   // Get widget type metadata
   getWidgetTypeMetadata(type: WidgetType): WidgetTypeMetadata | undefined {
     return WIDGET_TYPES.find(wt => wt.type === type);
+  }
+
+  // Clear error state
+  clearError(): void {
+    this.setLoadingState({ error: null });
+  }
+
+  // Get API connection status
+  async testApiConnection(): Promise<boolean> {
+    try {
+      return await firstValueFrom(this.widgetApiService.testConnection());
+    } catch {
+      return false;
+    }
+  }
+
+  // Get API configuration
+  getApiConfig() {
+    return this.widgetApiService.getApiConfig();
   }
 }

@@ -50,11 +50,36 @@
   </div>
 
   <!-- ROW 2: CONTENT/FUNCTIONALITY ROW (FLEXIBLE HEIGHT, NON-SCROLLABLE) -->
-  <!-- Dev Note: This row takes remaining space. NOT scrollable by default. -->
-  <!-- Dev Note: To make scrollable, add 'overflow-y: auto' to 'widget-content-slot' in CSS -->
-  <!-- Dev Note: Widget content is dynamically loaded based on widget.type -->
   <div class="widget-content-slot">
-    <ng-template appWidgetContentHost></ng-template>
+    @switch (widget.type) {
+      @case ('widget-1') {
+        <app-widget-1 [widget]="widget"></app-widget-1>
+      }
+      @case ('widget-2') {
+        <app-widget-2 [widget]="widget"></app-widget-2>
+      }
+      @case ('pie-chart') {
+        <app-pie-chart-widget [widget]="widget"></app-pie-chart-widget>
+      }
+      @case ('bar-chart') {
+        <app-bar-chart-widget [widget]="widget"></app-bar-chart-widget>
+      }
+      @case ('stats-card') {
+        <app-stats-card-widget [widget]="widget"></app-stats-card-widget>
+      }
+      @case ('progress-ring') {
+        <app-progress-ring-widget [widget]="widget"></app-progress-ring-widget>
+      }
+      @case ('data-table') {
+        <app-data-table-widget [widget]="widget"></app-data-table-widget>
+      }
+      @case ('line-chart') {
+        <app-line-chart-widget [widget]="widget"></app-line-chart-widget>
+      }
+      @default {
+        <div>Unknown widget type: {{ widget.type }}</div>
+      }
+    }
   </div>
 
   <div class="resize-handle" 

@@ -46,6 +46,8 @@ export class DashboardComponent {
   
   // Signals
   widgets = this.dashboardService.widgets;
+  loadingState = this.dashboardService.loadingState;
+  isLoading = this.dashboardService.isLoading;
   showGrid = signal(false);
   showAddDialog = signal(false);
   
@@ -309,17 +311,49 @@ export class DashboardComponent {
   }
   
   // Widget event handlers
-  onWidgetDelete(widget: Widget): void {
-    this.dashboardService.deleteWidget(widget.id);
+  async onWidgetDelete(widget: Widget): Promise<void> {
+    try {
+      await this.dashboardService.deleteWidget(widget.id);
+    } catch (error) {
+      console.error('Failed to delete widget:', error);
+      // Error is already handled in the service
+    }
   }
   
-  onWidgetTitleChange(event: { id: string; title: string }): void {
-    this.dashboardService.updateWidgetTitle(event.id, event.title);
+  async onWidgetTitleChange(event: { id: string; title: string }): Promise<void> {
+    try {
+      await this.dashboardService.updateWidgetTitle(event.id, event.title);
+    } catch (error) {
+      console.error('Failed to update widget title:', error);
+      // Error is already handled in the service
+    }
+  }
+
+  onWidgetRefresh(widget: Widget): void {
+    console.log('Refreshing individual widget:', widget.title);
+    // The refresh button event is handled by emitting to the parent (dashboard),
+    // but the actual refresh logic should be handled by the individual widget
+    // components themselves through their refresh() methods.
+    // This method can be used for logging or additional dashboard-level actions.
   }
   
   // Toolbar actions
   toggleGrid(): void {
     this.showGrid.update(v => !v);
+  }
+
+  // Refresh widgets from API
+  async refreshWidgets(): Promise<void> {
+    try {
+      await this.dashboardService.refreshWidgets();
+    } catch (error) {
+      console.error('Failed to refresh widgets:', error);
+    }
+  }
+
+  // Clear error state
+  clearError(): void {
+    this.dashboardService.clearError();
   }
   
   // Global actions - emit events to App Component for coordination
@@ -344,10 +378,15 @@ export class DashboardComponent {
     this.showAddDialog.set(false);
   }
   
-  onAddWidgetConfirm(config: AddWidgetConfig): void {
-    // Delegate widget creation to service (business logic)
-    this.dashboardService.createAndAddWidget(config);
-    this.closeAddDialog();
+  async onAddWidgetConfirm(config: AddWidgetConfig): Promise<void> {
+    try {
+      // Delegate widget creation to service (business logic)
+      await this.dashboardService.createAndAddWidget(config);
+      this.closeAddDialog();
+    } catch (error) {
+      console.error('Failed to create widget:', error);
+      // Don't close dialog on error so user can retry
+    }
   }
   
   // Keyboard shortcuts

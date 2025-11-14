@@ -3,7 +3,13 @@
 // Widget type definitions - maps to actual widget components
 export type WidgetType = 
   | 'widget-1'       // Metrics and charts widget
-  | 'widget-2';      // Simple text widget
+  | 'widget-2'       // Simple text widget
+  | 'pie-chart'      // Online pie chart widget
+  | 'bar-chart'      // Online bar chart widget
+  | 'line-chart'     // Online line chart widget
+  | 'stats-card'     // Online statistics card
+  | 'progress-ring'  // Online progress ring widget
+  | 'data-table';    // Online data table widget
   // Add more widget types here as you create them
 
 export interface Widget {
@@ -27,12 +33,16 @@ export interface WidgetConfig {
   [key: string]: any;                           // Allow custom config
 }
 
-// Data source configuration (provision for future database integration)
+// Data source configuration for remote widget data
 export interface WidgetDataSource {
-  endpoint?: string;                            // API endpoint (not used yet)
-  params?: Record<string, any>;                 // Query parameters (not used yet)
-  method?: 'GET' | 'POST';                      // HTTP method (not used yet)
-  cacheTimeout?: number;                        // Cache duration in seconds (not used yet)
+  endpoint?: string;                            // API endpoint URL
+  params?: Record<string, any>;                 // Query parameters for the API call
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';   // HTTP method
+  cacheTimeout?: number;                        // Cache duration in seconds
+  headers?: Record<string, string>;             // Custom headers for API calls
+  lastFetched?: Date;                          // Timestamp of last successful fetch
+  isLoading?: boolean;                         // Loading state for this widget's data
+  error?: string;                              // Last error message if any
 }
 
 export interface DashboardLayout {
@@ -88,24 +98,96 @@ export interface WidgetTypeMetadata {
   icon: string;  // Icon name or path
   defaultSize: { colSpan: number; rowSpan: number };
   defaultConfig?: WidgetConfig;
+  /**
+   * Whether this widget type is provided by the online service.
+   * If false or undefined, it will be treated as a local/create-new widget.
+   */
+  isOnlineSource?: boolean;
 }
 
 // Available widget types with metadata
 // Add new widgets here when you create them
 export const WIDGET_TYPES: WidgetTypeMetadata[] = [
+  // Local / Create New widget types
   {
     type: 'widget-1',
     label: 'Metrics & Charts',
     description: 'Displays metrics and bar charts',
     icon: 'chart-bar',
-    defaultSize: { colSpan: 3, rowSpan: 2 }  // Wider for metrics and charts
+    defaultSize: { colSpan: 3, rowSpan: 2 }
   },
   {
     type: 'widget-2',
     label: 'Text Widget',
     description: 'Simple static text display',
     icon: 'text',
-    defaultSize: { colSpan: 2, rowSpan: 1 }  // Compact for text content
+    defaultSize: { colSpan: 2, rowSpan: 1 }
+  },
+
+  // Online widget types (only appear in "From Online" tab)
+  {
+    type: 'pie-chart',
+    label: 'Pie Chart',
+    description: 'Interactive pie chart with live data',
+    icon: 'pie-chart',
+    defaultSize: { colSpan: 2, rowSpan: 2 },
+    isOnlineSource: true
+  },
+  {
+    type: 'bar-chart',
+    label: 'Bar Chart',
+    description: 'Dynamic bar chart visualization',
+    icon: 'bar-chart',
+    defaultSize: { colSpan: 3, rowSpan: 2 },
+    isOnlineSource: true
+  },
+  {
+    type: 'line-chart',
+    label: 'Line Chart',
+    description: 'Time series line chart',
+    icon: 'line-chart',
+    defaultSize: { colSpan: 3, rowSpan: 2 },
+    isOnlineSource: true
+  },
+  {
+    type: 'stats-card',
+    label: 'Statistics Card',
+    description: 'Key metrics and statistics',
+    icon: 'stats',
+    defaultSize: { colSpan: 2, rowSpan: 1 },
+    isOnlineSource: true
+  },
+  {
+    type: 'progress-ring',
+    label: 'Progress Ring',
+    description: 'Circular progress indicator',
+    icon: 'progress-ring',
+    defaultSize: { colSpan: 1, rowSpan: 1 },
+    isOnlineSource: true
+  },
+  {
+    type: 'data-table',
+    label: 'Data Table',
+    description: 'Tabular data display',
+    icon: 'table',
+    defaultSize: { colSpan: 4, rowSpan: 3 },
+    isOnlineSource: true
   }
-  // Add more widget types here...
 ];
+
+// Loading states for dashboard operations
+export interface DashboardLoadingState {
+  isLoadingWidgets: boolean;
+  isCreatingWidget: boolean;
+  isUpdatingWidget: boolean;
+  isDeletingWidget: boolean;
+  error: string | null;
+}
+
+// Widget synchronization status
+export interface WidgetSyncStatus {
+  id: string;
+  lastSynced: Date | null;
+  isPending: boolean;
+  error: string | null;
+}

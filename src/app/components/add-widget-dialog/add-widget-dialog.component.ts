@@ -1,15 +1,21 @@
 // src/app/components/add-widget-dialog/add-widget-dialog.component.ts
 
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { WidgetType, WIDGET_TYPES, WIDGET_COLOR_PALETTE, getRandomWidgetColor, WidgetTypeMetadata } from '../../models/widget.model';
+import { Subject, takeUntil, finalize } from 'rxjs';
+import { WidgetType, WIDGET_TYPES, WIDGET_COLOR_PALETTE, getRandomWidgetColor, WidgetTypeMetadata, Widget } from '../../models/widget.model';
+import { WidgetApiService } from '../../services/widget-api.service';
 
 export interface AddWidgetConfig {
   title: string;
   type: WidgetType;
   color: string;
+  fromOnline?: boolean;
+  onlineWidget?: Widget;
 }
+
+export type DialogTab = 'create' | 'preview';
 
 @Component({
   selector: 'app-add-widget-dialog',
@@ -18,10 +24,16 @@ export interface AddWidgetConfig {
   templateUrl: './add-widget-dialog.component.html',
   styleUrls: ['./add-widget-dialog.component.css']
 })
-export class AddWidgetDialogComponent implements OnInit {
+export class AddWidgetDialogComponent implements OnInit, OnDestroy {
   @Input() show: boolean = false;
   @Output() confirm = new EventEmitter<AddWidgetConfig>();
   @Output() cancel = new EventEmitter<void>();
+
+  private destroy$ = new Subject<void>();
+  private widgetApiService = inject(WidgetApiService);
+
+  // Tab management
+  activeTab: DialogTab = 'create';
 
   // Widget configuration
   widgetTitle = 'New Widget';
@@ -29,14 +41,94 @@ export class AddWidgetDialogComponent implements OnInit {
   selectedColor: string = getRandomWidgetColor();
 
   // Available options
-  availableWidgetTypes: WidgetTypeMetadata[] = WIDGET_TYPES;
+  // Only non-online (local/create-new) widget types should appear in the Create tab
+  availableWidgetTypes: WidgetTypeMetadata[] = WIDGET_TYPES.filter(w => !w.isOnlineSource);
   availableColors: string[] = WIDGET_COLOR_PALETTE;
 
-  // Future: Search and filter functionality
+  // Search and filter functionality
   searchQuery = '';
-  filteredWidgetTypes: WidgetTypeMetadata[] = WIDGET_TYPES;
+  filteredWidgetTypes: WidgetTypeMetadata[] = this.availableWidgetTypes;
+
+  // Online widgets preview
+  onlineWidgets: Widget[] = [];
+  isLoadingOnlineWidgets = false;
+  onlineWidgetsError: string | null = null;
+  selectedOnlineWidget: Widget | null = null;
 
   ngOnInit(): void {
+    this.resetForm();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * Switch between tabs
+   */
+  switchTab(tab: DialogTab): void {
+    this.activeTab = tab;
+    
+    // Load online widgets when switching to preview tab
+    if (tab === 'preview' && this.onlineWidgets.length === 0 && !this.isLoadingOnlineWidgets) {
+      this.loadOnlineWidgets();
+    }
+  }
+
+  /**
+   * Load widgets from online service for preview
+   */
+  loadOnlineWidgets(): void {
+    this.isLoadingOnlineWidgets = true;
+    this.onlineWidgetsError = null;
+
+    this.widgetApiService.fetchWidgets()
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.isLoadingOnlineWidgets = false)
+      )
+      .subscribe({
+        next: (widgets) => {
+          this.onlineWidgets = widgets;
+        },
+        error: (error) => {
+          this.onlineWidgetsError = error.message || 'Failed to load online widgets';
+          console.error('Failed to load online widgets:', error);
+        }
+      });
+  }
+
+  /**
+   * Retry loading online widgets
+   */
+  retryLoadOnlineWidgets(): void {
+    this.onlineWidgets = [];
+    this.loadOnlineWidgets();
+  }
+
+  /**
+   * Select an online widget for adding
+   */
+  selectOnlineWidget(widget: Widget): void {
+    this.selectedOnlineWidget = widget;
+  }
+
+  /**
+   * Add selected online widget
+   */
+  addOnlineWidget(): void {
+    if (!this.selectedOnlineWidget) return;
+
+    const config: AddWidgetConfig = {
+      title: this.selectedOnlineWidget.title,
+      type: this.selectedOnlineWidget.type,
+      color: this.selectedOnlineWidget.color,
+      fromOnline: true,
+      onlineWidget: { ...this.selectedOnlineWidget }
+    };
+
+    this.confirm.emit(config);
     this.resetForm();
   }
 
@@ -45,10 +137,13 @@ export class AddWidgetDialogComponent implements OnInit {
    */
   resetForm(): void {
     this.widgetTitle = 'New Widget';
-    this.selectedWidgetType = WIDGET_TYPES[0].type;
+    this.selectedWidgetType = this.availableWidgetTypes.length ? this.availableWidgetTypes[0].type : WIDGET_TYPES[0].type;
     this.selectedColor = getRandomWidgetColor();
     this.searchQuery = '';
-    this.filteredWidgetTypes = WIDGET_TYPES;
+  this.filteredWidgetTypes = this.availableWidgetTypes;
+    this.activeTab = 'create';
+    this.selectedOnlineWidget = null;
+    this.onlineWidgetsError = null;
   }
 
   /**
@@ -90,14 +185,15 @@ export class AddWidgetDialogComponent implements OnInit {
   }
 
   /**
-   * Handle confirm action
+   * Handle confirm action for creating new widget
    * Note: Size is determined by widget type's defaultSize from WIDGET_TYPES metadata
    */
   onConfirm(): void {
     const config: AddWidgetConfig = {
       title: this.widgetTitle || 'New Widget',
       type: this.selectedWidgetType,
-      color: this.selectedColor
+      color: this.selectedColor,
+      fromOnline: false
     };
 
     this.confirm.emit(config);
@@ -112,6 +208,13 @@ export class AddWidgetDialogComponent implements OnInit {
       event.preventDefault();
       this.onConfirm();
     }
+  }
+
+  /**
+   * Get widget type metadata by type
+   */
+  getWidgetTypeMetadata(type: WidgetType): WidgetTypeMetadata | undefined {
+    return WIDGET_TYPES.find(wt => wt.type === type);
   }
 }
 

@@ -17,9 +17,11 @@ export class DashboardHeaderComponent {
   
   @Input() widgetCount = 0;
   @Input() showGrid = false;
+  @Input() isLoading = false;
   
   @Output() addWidget = new EventEmitter<void>();
   @Output() toggleGrid = new EventEmitter<void>();
+  @Output() refreshWidgets = new EventEmitter<void>();
   @Output() exportLayout = new EventEmitter<void>();
   @Output() importFile = new EventEmitter<Event>();
   @Output() resetLayout = new EventEmitter<void>();
